@@ -1,9 +1,3 @@
-"""Лексер языка «Рошан»: читает программу .dota и выводит таблицу токенов.
-
-Запуск:  python lexer.py examples/factorial.dota
-         (или без параметра - тогда программа спросит путь)
-"""
-
 import re
 import sys
 from dataclasses import dataclass
@@ -22,7 +16,6 @@ class Kind(Enum):
     ERROR = "ОШИБКА"
 
 
-# Ключевые слова и что они значат
 KEYWORDS = {
     "пик":       "начало программы",
     "гг":        "конец программы",
@@ -40,7 +33,6 @@ KEYWORDS = {
     "закуп":     "ввод",
 }
 
-# Операторы, которые пишутся словами
 WORD_OPERATORS = {
     "хил":  "сложение (+)",
     "урон": "вычитание (-)",
@@ -52,7 +44,6 @@ WORD_OPERATORS = {
     "не":   "логическое НЕ",
 }
 
-# Операторы-символы
 SYMBOL_OPERATORS = {
     "=":  "присваивание",
     "==": "равно",
@@ -63,7 +54,6 @@ SYMBOL_OPERATORS = {
     ">=": "больше или равно",
 }
 
-# Разделители
 DELIMITERS = {
     ";": "конец команды",
     ",": "запятая",
@@ -75,7 +65,6 @@ DELIMITERS = {
     "]": "конец индекса",
 }
 
-# Подсказки для символов, которых в «Рошане» нет
 HINTS = {
     "+": "сложение пишется словом «хил»",
     "-": "вычитание пишется словом «урон»",
@@ -87,7 +76,7 @@ HINTS = {
 
 MAX_NUMBER = 2147483647  # самое большое число, которое помещается в 32-битный регистр
 
-# Одно регулярное выражение на все виды лексем. Порядок важен: пробуется сверху вниз.
+# Одно регулярное выражение на все виды лексем.
 LETTER = "A-Za-zА-Яа-яЁё_"
 TOKEN_REGEX = re.compile(rf"""
     (?P<space>    [ \t\r\n]+ )                    # пробелы и переводы строк
@@ -110,7 +99,6 @@ class Token:
     column: int     # столбец
     meaning: str    # что это значит (или текст ошибки)
 
-
 class Lexer:
     """Разбивает текст программы на токены."""
 
@@ -121,7 +109,7 @@ class Lexer:
     def tokenize(self):
         tokens = []
         line = 1
-        line_start = 0  # с какой позиции в тексте начинается текущая строка
+        line_start = 0 
 
         for match in TOKEN_REGEX.finditer(self.source):
             group = match.lastgroup
@@ -129,7 +117,7 @@ class Lexer:
             column = match.start() - line_start + 1
 
             if group == "space" or group == "comment":
-                pass  # пропускаем
+                pass  
             elif group == "word":
                 tokens.append(self.word_token(text, line, column))
             elif group == "number":
@@ -145,10 +133,9 @@ class Lexer:
                 tokens.append(self.error(text, line, column, "имя не может начинаться с цифры"))
             elif group == "badstr":
                 tokens.append(self.error(text, line, column, "строка не закрыта кавычкой"))
-            else:  # bad
+            else: 
                 tokens.append(self.error(text, line, column, HINTS.get(text, "неизвестный символ")))
 
-            # следим за номером строки
             if "\n" in text:
                 line += text.count("\n")
                 line_start = match.start() + text.rfind("\n") + 1
@@ -175,8 +162,6 @@ class Lexer:
         return Token(Kind.ERROR, text, line, column, message)
 
 
-# ---------- вывод таблицы ----------
-
 def shorten(text, width):
     """Обрезать длинную лексему (например, строку), чтобы не ломать таблицу."""
     return text if len(text) <= width else text[:width - 1] + "…"
@@ -188,7 +173,7 @@ def run(path):
         print("Предупреждение: программы на «Рошане» обычно имеют расширение .dota")
 
     try:
-        with open(path, encoding="utf-8-sig") as file:  # utf-8-sig убирает метку BOM от Блокнота
+        with open(path, encoding="utf-8-sig") as file:
             source = file.read()
     except OSError:
         print(f"Ошибка: не удалось открыть файл {path}")
@@ -222,11 +207,11 @@ def main():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-    interactive = len(sys.argv) < 2  # запуск без параметра (например, двойным щелчком)
+    interactive = len(sys.argv) < 2 
     try:
         if interactive:
             path = input("Введите путь к файлу .dota (например, examples/factorial.dota): ")
-            path = path.strip().strip('"')  # Windows добавляет кавычки, если перетащить файл в окно
+            path = path.strip().strip('"') 
             print()
         else:
             path = sys.argv[1]
