@@ -1,4 +1,4 @@
-# Лексер Рошан
+# Лексер Дота
 
 ## Словарь
 | Слово | Значение | Аналог |
@@ -54,7 +54,7 @@ target = IDENT [ "[" expression "]" ]
 ```
 
 ## Expressions
-```roshan
+```dota
 expression = and_expr { "или" and_expr }
 and_expr = equality { "и" equality }
 equality = comparison { ( "==" | "!=" ) comparison }
@@ -66,18 +66,18 @@ factor = NUMBER | call | target | "(" expression ")"
 ```
 
 ## Condition constructions
-```roshan
+```dota
 if_stmt = "вард" "(" expression ")" block [ "туман" ( block | if_stmt ) ]
 ```
 
 ## Cycles
-```roshan
+```dota
 while_stmt = "фармить" "(" expression ")" block
 for_stmt = "волна" IDENT "=" expression "до" expression block
 ```
 
 ## Functions
-```roshan
+```dota
 function = "скилл" IDENT "(" [ IDENT { "," IDENT } ] ")" block
 return_stmt = "тп" [ expression ] ";"
 call = IDENT "(" [ expression { "," expression } ] ")"
@@ -85,14 +85,14 @@ call_stmt = call ";"
 ```
 
 ## Base
-```roshan
+```dota
 print_stmt = "пинг" ( expression | STRING ) ";"
 input_stmt = "закуп" target ";"
 statement = var_stmt | const_stmt | array_stmt | assign_stmt | if_stmt | while_stmt | for_stmt | return_stmt | print_stmt | input_stmt | call_stmt
 ```
 
 ## Tokens
-```roshan
+```dota
 IDENT = letter { letter | digit }
 NUMBER = digit { digit }
 STRING = '"' { ? любой символ, кроме кавычки и перевода строки ? } '"'
